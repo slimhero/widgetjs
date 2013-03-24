@@ -1,0 +1,3 @@
+This is an attempt to create a engine based on component idea for web.
+It's widget engine uses requirejs to load file, backbone and 
+backbone.layoutmnanager for view and handlebars for templating.  
