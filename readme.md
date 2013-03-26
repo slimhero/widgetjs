@@ -7,6 +7,7 @@ backbone.layoutmnanager for view and handlebars for templating.
 
 Requirements
 ____________
+
 You will need [jQuery](), [RequireJS](), [Backbone](), [Backbone.LayoutManager]()
 and [Handlebars]()
 
@@ -14,12 +15,12 @@ Usage
 _____
 
 For the first time, html file must be consisted RequireJS
-'''html
+```html
 <script data-main='/config' src='/libs/require.js'></script>
-'''
+```
 
 Config.js for RequireJS
-'''javascript
+```javascript
 require(
    [
     "/libs/jquery-1.8.3.js",
@@ -47,7 +48,7 @@ require(
 		});
 	}
 );
-'''
+```
 
 Example
 _______
