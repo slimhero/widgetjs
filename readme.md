@@ -7,8 +7,8 @@ backbone.layoutmnanager for view and handlebars for templating.
 
 ## Requirements ##
 
-You will need [jQuery](), [RequireJS](), [Backbone](), [Backbone.LayoutManager]()
-and [Handlebars]()
+You will need [jQuery](http://www.jquery.com), [RequireJS](http://www.requirejs.org), [Backbone](http://www.backbonejs.org), [Backbone.LayoutManager](https://github.com/tbranyen/backbone.layoutmanager)
+and [Handlebars](http://www.handlebarsjs.com)
 
 ## Usage ##
 
@@ -26,9 +26,9 @@ require(
     "/libs/handlebars-1.0.rc.1.js",
     "/libs/backbone.js",
     "/libs/backbone.layoutmanager.js",
-		"/widget.js"
-	],
-	function(){
+    "/widget.js"
+   ],
+   function(){
     $(document).ready(function() {
       test_widget = new Component.Widget({
         name: "test_widget",
@@ -43,8 +43,8 @@ require(
       });
 
       test_widget.render();
-		});
-	}
+    });
+   }
 );
 ```
 
