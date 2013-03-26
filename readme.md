@@ -5,14 +5,12 @@ This is an attempt to create a engine based on component idea for web.
 It's widget engine uses requirejs to load file, backbone and 
 backbone.layoutmnanager for view and handlebars for templating.  
 
-Requirements
-____________
+## Requirements ##
 
 You will need [jQuery](), [RequireJS](), [Backbone](), [Backbone.LayoutManager]()
 and [Handlebars]()
 
-Usage
-_____
+## Usage ##
 
 For the first time, html file must be consisted RequireJS
 ```html
@@ -50,8 +48,7 @@ require(
 );
 ```
 
-Example
-_______
+## Example ##
 
 Whats happend in the end, you can see in index.html 
 
