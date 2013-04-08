@@ -1,4 +1,4 @@
-Component = {
+Widget = {
   VERSION: "0.0.2",
   DESCRIPTION: "",
   DEBUG: true,
@@ -23,7 +23,7 @@ Component = {
    *   @message [String] - text message
    */   
   log: function( message ){
-    if( Component.DEBUG )
+    if( Widget.DEBUG )
       console.log( message );
   },
 
@@ -53,20 +53,6 @@ Component = {
 		// loading libs and files needs to widget
 		loadRequires: function( callback ){
       var r = this.include;
-      /*
-      // loading javascript
-			var aJSList = _.values( r.js );
-      if( aJSList.length > 0 ){
-        require( aJSList , function(){alert("!!");}, function(){alert("error");} ); 
-			}
-			// loading handlebars
-			// it can be only one
-			if( r.template ){
-        if( r.template.length > 0 && r.template !== "" ){
-          require( [ ("hbs!" + r.template) ], this.template );
-        }
-			}
-      */
       var aList = [];
       var aJSList  = _.values( r.js );
       var aCSSList = _.map( _.values( r.css ), function(item){ return 'css!'+item; } );
@@ -111,12 +97,12 @@ Component = {
 		}
 	},
 
-  Widget: function( options, html_el ){
+  create: function( options, html_el ){
     var obj  = {};
     // reinitialize options
     options = options || {};
 		// add standart data
-    _.extend( obj, Component.proto, options );
+    _.extend( obj, Widget.proto, options );
 
 
     //
@@ -130,20 +116,20 @@ Component = {
 		return obj;
 	},
 
-  // ## Component.init ##
+  // ## Widget.environment ##
   /**
    * initialize and load nessesary libs
    * Parameters:
    *   @callback [function] - run when initialization has been finished
    *   @error [function] - run when raise error
    */  
-  init: function( options, callback, error ){
+  environment: function( options, callback, error ){
     // Check for Loader
     if( window["Loader"] ){
       // when no data in options then
       // change options on Component.baseOptions
       if( typeof options === 'undefined' ){
-        options = Component.baseOptions;
+        options = Widget.baseOptions;
       }
       // Other way, create new object from options 
       // and Component.baseOptions
@@ -156,7 +142,7 @@ Component = {
           return destination;
         };
 
-        options = Object.extend( /*options,*/ Component.baseOptions, options );
+        options = Object.extend( /*options,*/ Widget.baseOptions, options );
       };
 
       // Array
@@ -173,7 +159,7 @@ Component = {
       }
     }
     else{
-      Component.log( "loader.js is nessesary" );
+      Widget.log( "loader.js is nessesary" );
     }
   }
 

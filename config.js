@@ -4,12 +4,12 @@ Loader.Manager(
   ], 
   function(){ 
     
-    Component.init( 
-      {"Component.Menu": "widgets/menu/menu.js"}, 
+    Widget.environment( 
+      {"Widget.Menu": "widgets/menu/menu.js"}, 
       function(){
-        var protoMenu = Component.Menu;
+        var protoMenu = Widget.Menu;
         protoMenu.view.templateData.title = "TesT";
-        menu = new Component.Widget( protoMenu, ".context" );
+        menu = new Widget.create( protoMenu, ".context" );
       }
     );
   } 
