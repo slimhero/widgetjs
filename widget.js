@@ -39,7 +39,11 @@ Widget = {
 		template: {},
     templateData: {},
 		// initializing
-		init: function(){
+		init: function( callback ){
+      if( callback && (typeof callback !== 'undefined') )
+        this.callback = callback;
+      else
+        this.callback = null;
       var that = this;
 
       that.loadRequires( 
@@ -47,6 +51,9 @@ Widget = {
           component.setModel();
           component.setView();
           component.render();
+          if( component.callback && (typeof component.callback !== 'undefined') ){
+            component.callback();
+          }
         }.bind( null, that ) 
       );
 		},
@@ -97,7 +104,7 @@ Widget = {
 		}
 	},
 
-  create: function( options, html_el ){
+  create: function( options, html_el, callback ){
     var obj  = {};
     // reinitialize options
     options = options || {};
@@ -111,7 +118,7 @@ Widget = {
     };
 
     // init object
-    obj.init();
+    obj.init( callback );
 		// return object
 		return obj;
 	},

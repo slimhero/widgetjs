@@ -1,0 +1,15 @@
+<div>
+  {{#if active }}
+  <li class="active">
+  {{else}}
+  <li>
+  {{/if}}
+    {{#if link }}
+    <a href="{{link}}">
+    {{else}}
+    <a href="#">
+    {{/if}}
+      {{ name }}
+    </a>
+  </li>
+</div>

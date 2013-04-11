@@ -1,18 +1,20 @@
-Widget.Menu = {
-  name: "bootstrap_menu",
+Widget.menuItem = {
+  name: "bootsrap_menuItem",
   include: {
     js: { "Bootstrap": "/share/bootstrap/js/bootstrap.js" },
     css: { 
       "bootstrap": "/share/bootstrap/css/bootstrap.css",
       "bootstrap-resp": "/share/bootstrap/css/bootstrap-responsive.css"
     },
-    template:{ "menu": "hbs!/widgets/menu/menu.hbs" }
+    template:{ "menuItem": "hbs!/widgets/menuItem/menuItem.hbs" }
   },
-  view: {
-    el: 'body',
-    templateData: { 
+  view:{
+    manage: true,
+    el: ".nav",
+    templateData:{
       id: this.id,
-      title: "Example menu" 
+      name: "Test",
+      link: "#"
     }
   }
-};
+}
