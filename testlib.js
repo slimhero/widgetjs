@@ -1,1 +1,0 @@
-alert( "Lib's loaded" );

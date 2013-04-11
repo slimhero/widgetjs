@@ -18,10 +18,11 @@ Loader.Manager(
         var that = this;
 
         protoMenu.view.templateData.title = "TesT";
-        //protoMenu.view["views"][".nav"] = Widget.menuItem;
+        // Create menu widget with new name
         menu = new Widget.create( 
           protoMenu, 
           ".context", 
+          // As soon as menu is created we create his item  
           function( item, protoItem ){
             item = new Widget.create( protoItem, ".nav" );
           }.bind( that, item, protoItem )

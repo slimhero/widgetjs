@@ -30,7 +30,7 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>Component = {
+            <div class="content"><div class='highlight'><pre>Widget = {
   VERSION: <span class="string">"0.0.2"</span>,
   DESCRIPTION: <span class="string">""</span>,
   DEBUG: <span class="literal">true</span>,</pre></div></div>
@@ -78,7 +78,7 @@ Works when Loader.DEBUG is true</p>
    *   @message [String] - text message
    */</span>   
   log: <span class="keyword">function</span>( message ){
-    <span class="keyword">if</span>( Component.DEBUG )
+    <span class="keyword">if</span>( Widget.DEBUG )
       console.log( message );
   },
 
@@ -87,7 +87,7 @@ Works when Loader.DEBUG is true</p>
 		include: {
       js:{},
 			css:{},
-			template:<span class="string">""</span>
+			template:{}
 		},
 		view: {},
 		model: {},
@@ -107,8 +107,24 @@ Works when Loader.DEBUG is true</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>		init: <span class="keyword">function</span>(){
-      <span class="keyword">this</span>.loadRequires();</pre></div></div>
+            <div class="content"><div class='highlight'><pre>		init: <span class="keyword">function</span>( callback ){
+      <span class="keyword">if</span>( callback &amp;&amp; (<span class="keyword">typeof</span> callback !== <span class="string">'undefined'</span>) )
+        <span class="keyword">this</span>.callback = callback;
+      <span class="keyword">else</span>
+        <span class="keyword">this</span>.callback = <span class="literal">null</span>;
+      <span class="keyword">var</span> that = <span class="keyword">this</span>;
+
+      that.loadRequires( 
+        <span class="keyword">function</span>( component ){
+          component.setModel();
+          component.setView();
+          component.render();
+          <span class="keyword">if</span>( component.callback &amp;&amp; (<span class="keyword">typeof</span> component.callback !== <span class="string">'undefined'</span>) ){
+            component.callback();
+          }
+        }.bind( <span class="literal">null</span>, that ) 
+      );
+		},</pre></div></div>
             
         </li>
         
@@ -119,11 +135,31 @@ Works when Loader.DEBUG is true</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p>init model as object</p>
+              <p>loading libs and files needs to widget</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>			<span class="keyword">this</span>.setModel();</pre></div></div>
+            <div class="content"><div class='highlight'><pre>		loadRequires: <span class="keyword">function</span>( callback ){
+      <span class="keyword">var</span> r = <span class="keyword">this</span>.include;
+      <span class="keyword">var</span> aList = [];
+      <span class="keyword">var</span> aJSList  = _.values( r.js );
+      <span class="keyword">var</span> aCSSList = _.map( _.values( r.css ), <span class="keyword">function</span>(item){ <span class="keyword">return</span> <span class="string">'css!'</span>+item; } );
+      <span class="keyword">var</span> aHBSList = _.values( r.template ); 
+      aList = aJSList.concat( aCSSList, aHBSList );
+      Loader.Manager( aList, callback );
+		},
+		setView: <span class="keyword">function</span>(){
+      <span class="keyword">this</span>.options = <span class="keyword">this</span>.view;
+    
+      <span class="keyword">if</span>( <span class="keyword">this</span>.include.template ){
+        <span class="keyword">var</span> template = Handlebars.compile( 
+          $(<span class="string">"script[data-template-name="</span>+ _.keys(<span class="keyword">this</span>.include.template)[<span class="number">0</span>] +<span class="string">"]"</span>).html()
+        );
+        template = template( _.extend({},<span class="keyword">this</span>.view.templateData) ) ;
+        _.extend( 
+            <span class="keyword">this</span>.view, 
+            {
+              model: <span class="keyword">this</span>.model,</pre></div></div>
             
         </li>
         
@@ -134,12 +170,18 @@ Works when Loader.DEBUG is true</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>init view as object</p>
+              <p>template: this.template ( this.templateData ) 
+template: Handlebars.compile( this.view.$el.find(&quot;script[data-template-name=menu]&quot;).html() )</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>			<span class="keyword">this</span>.setView();
-		},</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              template: template 
+            } 
+        );
+      }
+      <span class="keyword">else</span>{
+        _.extend( <span class="keyword">this</span>.view, {model: <span class="keyword">this</span>.model, template: <span class="keyword">this</span>.template } );
+      }</pre></div></div>
             
         </li>
         
@@ -150,12 +192,15 @@ Works when Loader.DEBUG is true</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>loading libs and files needs to widget</p>
+              <p>_.extend( this.view, {model: this.model, /<em>template: this.template</em>/ } );</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>		loadRequires: <span class="keyword">function</span>(){
-      <span class="keyword">var</span> r = <span class="keyword">this</span>.include;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      <span class="keyword">this</span>.view = Backbone.Layout.extend( <span class="keyword">this</span>.view );
+		},
+		setModel: <span class="keyword">function</span>(){
+      <span class="keyword">this</span>.model = Backbone.Model.extend( <span class="keyword">this</span>.model );
+		},</pre></div></div>
             
         </li>
         
@@ -165,72 +210,6 @@ Works when Loader.DEBUG is true</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
-              </div>
-              <p>loading javascript</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>			<span class="keyword">var</span> aJSList = _.values( r.js );
-      <span class="keyword">if</span>( aJSList.length &gt; <span class="number">0</span> ){
-        require( aJSList , <span class="keyword">function</span>(){alert(<span class="string">"!!"</span>);}, <span class="keyword">function</span>(){alert(<span class="string">"error"</span>);} ); 
-			}</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-9">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
-              </div>
-              <p>loading handlebars
-it can be only one</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>			<span class="keyword">if</span>( r.template ){
-        <span class="keyword">if</span>( r.template.length &gt; <span class="number">0</span> &amp;&amp; r.template !== <span class="string">""</span> ){
-          require( [ (<span class="string">"hbs!"</span> + r.template) ], <span class="keyword">this</span>.template );
-        }
-			}
-		},
-		setView: <span class="keyword">function</span>(){
-      <span class="keyword">this</span>.options = <span class="keyword">this</span>.view;</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-10">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
-              </div>
-              <p>var view = {};</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span>( <span class="keyword">this</span>.include.template ){
-        _.extend( <span class="keyword">this</span>.view, {model: <span class="keyword">this</span>.model, template: <span class="keyword">this</span>.template( <span class="keyword">this</span>.templateData ) } );
-      }
-      <span class="keyword">else</span>{
-        _.extend( <span class="keyword">this</span>.view, {model: <span class="keyword">this</span>.model, template: <span class="keyword">this</span>.template } );
-      }
-      <span class="keyword">this</span>.view = Backbone.Layout.extend( <span class="keyword">this</span>.view );
-		},
-		setModel: <span class="keyword">function</span>(){
-      <span class="keyword">this</span>.model = Backbone.Model.extend( <span class="keyword">this</span>.model );
-		},</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-11">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p>render view</p>
 
@@ -243,30 +222,31 @@ it can be only one</p>
         </li>
         
         
-        <li id="section-12">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p>this.view.render();</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>		}
+            <div class="content"><div class='highlight'><pre>      <span class="keyword">return</span> <span class="keyword">this</span>;
+		}
 	},
 
-  Widget: <span class="keyword">function</span>( options ){
+  create: <span class="keyword">function</span>( options, html_el, callback ){
     <span class="keyword">var</span> obj  = {};</pre></div></div>
             
         </li>
         
         
-        <li id="section-13">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p>reinitialize options</p>
 
@@ -277,41 +257,57 @@ it can be only one</p>
         </li>
         
         
-        <li id="section-14">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p>add standart data</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    _.extend( obj, Component.proto, options );</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    _.extend( obj, Widget.proto, options );</pre></div></div>
             
         </li>
         
         
-        <li id="section-15">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span>( html_el ){
+      obj.view.el = html_el;
+    };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>init object</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    obj.init();</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    obj.init( callback );</pre></div></div>
             
         </li>
         
         
-        <li id="section-16">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>return object</p>
 
@@ -323,13 +319,13 @@ it can be only one</p>
         </li>
         
         
-        <li id="section-17">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap for-h2">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <h2>Component.init</h2>
+              <h2>Widget.environment</h2>
 
             </div>
             
@@ -339,16 +335,16 @@ it can be only one</p>
    *   @callback [function] - run when initialization has been finished
    *   @error [function] - run when raise error
    */</span>  
-  init: <span class="keyword">function</span>( options, callback, error ){</pre></div></div>
+  environment: <span class="keyword">function</span>( options, callback, error ){</pre></div></div>
             
         </li>
         
         
-        <li id="section-18">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>Check for Loader</p>
 
@@ -359,11 +355,11 @@ it can be only one</p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>when no data in options then
 change options on Component.baseOptions</p>
@@ -371,19 +367,19 @@ change options on Component.baseOptions</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span>( <span class="keyword">typeof</span> options === <span class="string">'undefined'</span> ){
-        options = Component.baseOptions;
+        options = Widget.baseOptions;
       }</pre></div></div>
             
         </li>
         
         
-        <li id="section-20">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p>Other way? create new object from options 
+              <p>Other way, create new object from options 
 and Component.baseOptions</p>
 
             </div>
@@ -393,11 +389,11 @@ and Component.baseOptions</p>
         </li>
         
         
-        <li id="section-21">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>Simple extend of two object
 But needs before underscore.js</p>
@@ -410,17 +406,17 @@ But needs before underscore.js</p>
           <span class="keyword">return</span> destination;
         };
 
-        options = Object.extend( options, Component.baseOptions );
+        options = Object.extend( <span class="comment">/*options,*/</span> Widget.baseOptions, options );
       };</pre></div></div>
             
         </li>
         
         
-        <li id="section-22">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>Array</p>
 
@@ -431,11 +427,11 @@ But needs before underscore.js</p>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>Prepare array of libraries url</p>
 
@@ -446,11 +442,11 @@ But needs before underscore.js</p>
         </li>
         
         
-        <li id="section-24">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>Fill array aFiles</p>
 
@@ -462,11 +458,11 @@ But needs before underscore.js</p>
         </li>
         
         
-        <li id="section-25">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>Loading nessessary libs when array is not empty</p>
 
@@ -477,7 +473,7 @@ But needs before underscore.js</p>
       }
     }
     <span class="keyword">else</span>{
-      Component.log( <span class="string">"loader.js is nessesary"</span> );
+      Widget.log( <span class="string">"loader.js is nessesary"</span> );
     }
   }
 
